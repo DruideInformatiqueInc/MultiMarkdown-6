@@ -894,6 +894,7 @@ void mmd_export_token_html(DString * out, const char * source, token * t, scratc
 
 		case BLOCK_TABLE:
 			pad(out, 2, scratch);
+			print_const("<div class=\"conteneur-table\">\n"); //DIV pour les tableaux adaptatifs
 			print_const("<table");
 
 			// Are we followed by a caption?
@@ -962,7 +963,8 @@ void mmd_export_token_html(DString * out, const char * source, token * t, scratc
 
 			mmd_export_token_tree_html(out, source, t->child, scratch);
 			pad(out, 1, scratch);
-			print_const("</table>");
+			print_const("</table>\n");
+			print_const("</div>"); //Fermeture du DIV pour les tableaux adaptatifs
 			scratch->padded = 0;
 
 			scratch->skip_token = temp_short;
