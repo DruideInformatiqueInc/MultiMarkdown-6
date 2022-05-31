@@ -27,7 +27,7 @@ set (My_Project_Copyright_Date "2016 - 2020")
 
 set (My_Project_Identifier "net.fletcherpenney.multimarkdown")
 
-string(TIMESTAMP My_Build_Version "%Y.%m.%d.%H.%M")
+string(TIMESTAMP My_Build_Version "%Y.%m.%d.%H.%M" UTC)
 
 
 # Search for included files here
@@ -211,6 +211,9 @@ set_target_properties("${My_Project_Title}"
 	XCODE_ATTRIBUTE_FRAMEWORK_SEARCH_PATHS "${XCODE_ATTRIBUTE_FRAMEWORK_SEARCH_PATHS} ${framework_search_paths_string}"
 	PUBLIC_HEADER "${public_headers}"
 	ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
+	XCODE_ATTRIBUTE_DEFINES_MODULE YES
+	XCODE_ATTRIBUTE_MODULEMAP_FILE "src/module.modulemap"
+#	XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "$SYMROOT/$CONFIGURATION"
 )
 
 if (hasParent)
@@ -228,6 +231,7 @@ endif()
 # Link to other libraries
 target_link_libraries("${My_Project_Title}"
 	${libraries_to_link}
+	m
 )
 
 # Link to Apple Cocoa Framework?
@@ -364,17 +368,30 @@ endif()
 # Build MultiMarkdown app
 if (hasParent)
 else()
-	add_executable(multimarkdown
-		src/d_string.c
+	if (DEFINED TEST)
+	else ()
+		add_executable(multimarkdown
+			src/d_string.c
 
-		src/main.c
-		src/argtable3.c
+			src/main.c
+			src/argtable3.c
 
-		${private_headers}
-		${public_headers}
-	)
+			${private_headers}
+			${public_headers}
+		)
 
-	target_link_libraries(multimarkdown "${My_Project_Title}")
+		target_link_libraries(multimarkdown "${My_Project_Title}")
+
+		set_target_properties(multimarkdown
+			PROPERTIES
+			XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=Debug] YES
+			XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=MinSizeRel] NO
+			XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=RelWithDebInfo] NO
+			XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=Release] NO
+			XCODE_LINK_BUILD_PHASE_MODE "KNOWN_LOCATION"
+		)
+
+	endif()
 endif()
 
 
